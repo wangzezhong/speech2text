@@ -54,6 +54,10 @@
       margin: 0 20px;
       font-size: 16px;
     }
+    .status-text {
+      color: #0080ff;
+      font-weight: bold;
+    }
 
     /* Responsive design for screens 600px or less */
     @media (max-width: 600px) {
@@ -96,7 +100,7 @@
     // Set up event listeners for the recognition process
     recognition.onstart = function () {
       console.log('Recognition started');
-      document.getElementById('transcription-results').innerText = "Transcribing in process...";
+      document.getElementById('transcription-results').innerHTML = "<span class='status-text'>Transcribing in process...</span>";
       recognitionStoppedByUser = false; // Reset this flag whenever recognition starts
     };
 
@@ -120,7 +124,7 @@
     recognition.onend = function () {
       console.log('Recognition ended');
       if (recognitionStoppedByUser) {
-        document.getElementById('transcription-results').innerText += "\nTranscribing is off.";
+        document.getElementById('transcription-results').innerHTML += "<br><span class='status-text'>Transcribing is off.</span>";
       }
     };
 
