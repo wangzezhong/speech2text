@@ -38,7 +38,7 @@
       flex-grow: 1;
     }
     button:hover {
-      background-color: #3e8e41;
+      background-color: #0080ff;
     }
     #transcription-controls {
       display: flex;
@@ -51,7 +51,7 @@
       color: green;
     }
     #transcription-results {
-      margin-top: 30px;
+      margin: 0 20px;
       font-size: 16px;
     }
 
@@ -76,8 +76,8 @@
       <button type="button" onclick="stopRecognition()">Stop Transcribing</button>
     </div>
     <div>
-      <button type="button" onclick="copyTranscription()">Copy Transcription</button>
-      <button type="button" onclick="downloadTranscription()">Download Transcription</button>
+      <button type="button" onclick="copyTranscription()" style="background-color: #0080ff;">Copy Transcription</button>
+      <button type="button" onclick="downloadTranscription()" style="background-color: #0080ff;">Download Transcription</button>
       <div id="copy-notification">Transcription copied</div>
     </div>
   </form>
