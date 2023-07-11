@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Speech-to-Text Transcription</title>
+  <style>
+    body {
+      font-family: sans-serif;
+    }
+    h1 {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+    form {
+      max-width: 600px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    textarea {
+      width: 100%;
+      height: 150px;
+      margin-bottom: 20px;
+      font-size: 16px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      padding: 10px;
+    }
+    button {
+      font-size: 16px;
+      border: none;
+      border-radius: 4px;
+      padding: 10px 20px;
+      background-color: #4caf50;
+      color: white;
+      cursor: pointer;
+      margin-right: 10px;
+      flex-grow: 1;
+    }
+    button:hover {
+      background-color: #3e8e41;
+    }
+    #transcription-controls {
+      display: flex;
+      justify-content: space-between;
+      width: 100%;
+      margin-bottom: 20px;
+    }
+    #copy-notification {
+      visibility: hidden;
+      color: green;
+    }
+    #transcription-results {
+      margin-top: 30px;
+      font-size: 16px;
+    }
+
+    /* Responsive design for screens 600px or less */
+    @media (max-width: 600px) {
+      form {
+        width: 90%;
+      }
+      button {
+        width: 100%;
+        margin: 10px 0;
+      }
+    }
+  </style>
+</head>
+<body>
+  <h1>Speech-to-Text Transcription</h1>
+
+  <form>
+    <div id="transcription-controls">
+      <button type="button" onclick="startRecognition()">Start Transcribing</button>
+      <button type="button" onclick="stopRecognition()">Stop Transcribing</button>
+    </div>
+    <div>
+      <button type="button" onclick="copyTranscription()">Copy Transcription</button>
+      <button type="button" onclick="downloadTranscription()">Download Transcription</button>
+      <div id="copy-notification">Transcription copied</div>
+    </div>
+  </form>
+
+  <div id="transcription-results"></div>
+
+  <script>
+    // Initialize the Web Speech API
+    const recognition = new webkitSpeechRecognition();
+    recognition.continuous = true;
+    recognition.interimResults = true;
+
+    let transcribedText = '';
+    let recognitionStoppedByUser = false;
+
+    // Set up event listeners for the recognition process
+    recognition.onstart = function () {
+      console.log('Recognition started');
+      document.getElementById('transcription-results').innerText = "Transcribing in process...";
+      recognitionStoppedByUser = false; // Reset this flag whenever recognition starts
+    };
+
+    recognition.onresult = function (event) {
+      let interim_transcript = '';
+      for (let i = event.resultIndex; i < event.results.length; i++) {
+        let transcription = event.results[i][0].transcript;
+        if (event.results[i].isFinal) {
+          transcribedText += transcription + " ";
+        } else {
+          interim_transcript += transcription;
+        }
+      }
+      document.getElementById('transcription-results').innerText = transcribedText + interim_transcript;
+    };
+
+    recognition.onerror = function (event) {
+      console.log('Recognition error: ' + event.error);
+    };
+
+    recognition.onend = function () {
+      console.log('Recognition ended');
+      if (recognitionStoppedByUser) {
+        document.getElementById('transcription-results').innerText += "\nTranscribing is off.";
+      }
+    };
+
+    // Start the recognition process when the "Start Transcribing" button is clicked
+    function startRecognition() {
+      transcribedText = '';
+      recognition.start();
+    }
+
+    // Stop the recognition process when the "Stop Transcribing" button is clicked
+    function stopRecognition() {
+      recognition.stop();
+      recognitionStoppedByUser = true;
+    }
+
+    // Copy the transcribed text
+    function copyTranscription() {
+      navigator.clipboard.writeText(transcribedText).then(function () {
+        console.log('Copying to clipboard was successful!');
+        let copyNotification = document.getElementById('copy-notification');
+        copyNotification.style.visibility = 'visible';
+        setTimeout(function () {
+          copyNotification.style.visibility = 'hidden';
+        }, 3000); // Hide the notification after 3 seconds
+      }, function (err) {
+        console.error('Could not copy text: ', err);
+      });
+    }
+
+    // Download the transcribed text
+    function downloadTranscription() {
+      let a = document.createElement('a');
+      a.href = "data:text/plain;charset=UTF-8," + encodeURIComponent(transcribedText);
+      a.download = 'transcription.txt';
+      a.style.display = 'none';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+    }
+  </script>
+</body>
+</html>
